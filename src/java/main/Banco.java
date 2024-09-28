@@ -33,7 +33,7 @@ public class Banco {
         
     }
 
-    public void depositar(String id, float valor) throws Exception{
+    public void depositar(String id, double valor) throws Exception{
         try{
             testaValorPositivo(valor);
             contaValida(id);
@@ -41,6 +41,47 @@ public class Banco {
         }
         catch(Exception e){
             throw new Exception("Deposito Erro:" + e.getMessage());
+        }
+    }
+
+    public void executarOperacao(String[] operacoBancaria) {
+
+        switch (operacoBancaria[0]) {
+
+            case "criar":
+
+                criar(operacoBancaria[1]);
+                
+                break;
+
+            case "depositar":
+
+                double valor = Double.parseDouble(operacoBancaria[2]);
+
+                try {
+                    depositar(operacoBancaria[1], valor);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
+                break;   
+
+                case "transferir":
+
+                valor = Double.parseDouble(operacoBancaria[3]);
+
+                try {
+                    transferir(operacoBancaria[1], operacoBancaria[2], valor);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
+                break;     
+                                  
+            default:
+                break;
         }
     }
 
@@ -70,37 +111,73 @@ public class Banco {
         }
     }
 
+    // public void testaOperacoBancaria(String[] operacoBancaria){
+    //     switch (operacoBancaria[0]) {
+    //         case "criar":
+
+                
+    //             break;
+        
+    //         default:
+    //             break;
+    //     }
+    // }
+
 
     public static void main(String[] args) {
         Banco banco = new Banco();
 
-        banco.criar("1");
-        banco.criar("2");
-        banco.criar("3");
+        // banco.criar("1");
+        // banco.criar("2");
+        // banco.criar("3");
 
-        try {
-            banco.depositar("2", 400);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem("criar;1");
+        banco.executarOperacao(operacoBancaria);
 
-        try {
-            banco.transferir("2","1", 125.55);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        operacoBancaria = Protocolo.getProtocolo().processarMensagem("criar;2");
+        banco.executarOperacao(operacoBancaria);
 
-        try {
-            banco.transferir("1","3", 25);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        operacoBancaria = Protocolo.getProtocolo().processarMensagem("criar;3");
+        banco.executarOperacao(operacoBancaria);
+
+        operacoBancaria = Protocolo.getProtocolo().processarMensagem("depositar;1;550");
+        banco.executarOperacao(operacoBancaria);
+
+        operacoBancaria = Protocolo.getProtocolo().processarMensagem("depositar;2;1550");
+        banco.executarOperacao(operacoBancaria);
+
+        operacoBancaria = Protocolo.getProtocolo().processarMensagem("depositar;3;150");
+        banco.executarOperacao(operacoBancaria);
+
+
+        operacoBancaria = Protocolo.getProtocolo().processarMensagem("transferir;1;2;75.5");
+        banco.executarOperacao(operacoBancaria);
+
+        // try {
+        //     banco.depositar("2", 400);
+        // } catch (Exception e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
+
+        // try {
+        //     banco.transferir("2","1", 125.55);
+        // } catch (Exception e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
+
+        // try {
+        //     banco.transferir("1","3", 25);
+        // } catch (Exception e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
 
 
         banco.contas.values().stream().forEach(System.out::println);
     }
+
+    
 
 }
