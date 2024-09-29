@@ -15,6 +15,9 @@ public class Protocolo {
     public String[] processarMensagem(String mensagem ) {
         
         String[] partes = mensagem.split(";");
+        for (int i = 0; i < partes.length; i++) {
+            partes[i] = partes[i].trim();
+        }
         return partes;
     }
         

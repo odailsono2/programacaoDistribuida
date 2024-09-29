@@ -4,9 +4,25 @@ public class Banco {
 
     private HashMap<String,Conta> contas = new HashMap<>();
 
-    public void criar(String id){
+    public String mensagemSaida = "";
+
+    public HashMap<String, Conta> getContas() {
+        return contas;
+    }
+
+    public void getSaldo(String id) throws Exception{
+
+        contaValida(id);
+        mensagemSaida = contas.get(id).toString();
+    }
+
+    public void criar(String id) throws Exception{
 
         Contabuilder criadorContas = new Contabuilder();
+
+        if (contas.containsKey(id)){
+            throw new Exception("Erro ao Criar Conta: a conta " +id+" já existe");
+        }
 
         Conta novaConta = criadorContas
                             .setId(id)
@@ -14,6 +30,9 @@ public class Banco {
                             .criarConta();
 
         contas.put(id, novaConta);
+
+        mensagemSaida = "Conta " +id+" criada com sucesso!";
+
         
     }
 
@@ -26,6 +45,7 @@ public class Banco {
                 testaSaldoSuficiente(idContaOrigem, valor);
                 contas.get(idContaOrigem).sacar(valor);
                 contas.get(idContaDestino).depositar(valor);
+                mensagemSaida = "Transferência Realizada!";
                
             } catch (Exception e) {
                 throw new Exception("Transferencia Erro: "+e.getMessage());
@@ -38,13 +58,14 @@ public class Banco {
             testaValorPositivo(valor);
             contaValida(id);
             contas.get(id).depositar(valor);
+            mensagemSaida = "Deposito Realizado";
         }
         catch(Exception e){
-            throw new Exception("Deposito Erro:" + e.getMessage());
+            throw new Exception("Deposito Erro: " + e.getMessage());
         }
     }
 
-    public void executarOperacao(String[] operacoBancaria) {
+    public void executarOperacao(String[] operacoBancaria) throws Exception{
 
         switch (operacoBancaria[0]) {
 
@@ -58,27 +79,26 @@ public class Banco {
 
                 double valor = Double.parseDouble(operacoBancaria[2]);
 
-                try {
-                    depositar(operacoBancaria[1], valor);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                
+                depositar(operacoBancaria[1], valor);
+
                 break;   
 
-                case "transferir":
+            case "transferir":
 
                 valor = Double.parseDouble(operacoBancaria[3]);
 
-                try {
-                    transferir(operacoBancaria[1], operacoBancaria[2], valor);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
                 
-                break;     
+                transferir(operacoBancaria[1], operacoBancaria[2], valor);
+
+                
+                break;    
+            case "saldo":
+            
+                getSaldo(operacoBancaria[1]);
+
+                ;
+
+                break;
                                   
             default:
                 break;
@@ -93,6 +113,7 @@ public class Banco {
             throw new Exception("Conta Inexistente");
         }
     }
+    
     public void testaValorPositivo(double valor) throws Exception{
         if (valor > 0){
             return;
@@ -111,18 +132,9 @@ public class Banco {
         }
     }
 
-    // public void testaOperacoBancaria(String[] operacoBancaria){
-    //     switch (operacoBancaria[0]) {
-    //         case "criar":
-
-                
-    //             break;
-        
-    //         default:
-    //             break;
-    //     }
-    // }
-
+    public String processarMensagemSaida(String mensagem){
+        return "";
+    }
 
     public static void main(String[] args) {
         Banco banco = new Banco();
@@ -131,27 +143,27 @@ public class Banco {
         // banco.criar("2");
         // banco.criar("3");
 
-        String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem("criar;1");
-        banco.executarOperacao(operacoBancaria);
+        // String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem("criar;1");
+        // banco.executarOperacao(operacoBancaria);
 
-        operacoBancaria = Protocolo.getProtocolo().processarMensagem("criar;2");
-        banco.executarOperacao(operacoBancaria);
+        // operacoBancaria = Protocolo.getProtocolo().processarMensagem("criar;2");
+        // banco.executarOperacao(operacoBancaria);
 
-        operacoBancaria = Protocolo.getProtocolo().processarMensagem("criar;3");
-        banco.executarOperacao(operacoBancaria);
+        // operacoBancaria = Protocolo.getProtocolo().processarMensagem("criar;3");
+        // banco.executarOperacao(operacoBancaria);
 
-        operacoBancaria = Protocolo.getProtocolo().processarMensagem("depositar;1;550");
-        banco.executarOperacao(operacoBancaria);
+        // operacoBancaria = Protocolo.getProtocolo().processarMensagem("depositar;1;550");
+        // banco.executarOperacao(operacoBancaria);
 
-        operacoBancaria = Protocolo.getProtocolo().processarMensagem("depositar;2;1550");
-        banco.executarOperacao(operacoBancaria);
+        // operacoBancaria = Protocolo.getProtocolo().processarMensagem("depositar;2;1550");
+        // banco.executarOperacao(operacoBancaria);
 
-        operacoBancaria = Protocolo.getProtocolo().processarMensagem("depositar;3;150");
-        banco.executarOperacao(operacoBancaria);
+        // operacoBancaria = Protocolo.getProtocolo().processarMensagem("depositar;3;150");
+        // banco.executarOperacao(operacoBancaria);
 
 
-        operacoBancaria = Protocolo.getProtocolo().processarMensagem("transferir;1;2;75.5");
-        banco.executarOperacao(operacoBancaria);
+        // operacoBancaria = Protocolo.getProtocolo().processarMensagem("transferir;1;2;75.5");
+        // banco.executarOperacao(operacoBancaria);
 
         // try {
         //     banco.depositar("2", 400);
