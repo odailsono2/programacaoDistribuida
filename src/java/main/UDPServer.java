@@ -1,17 +1,21 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import Protocolos.MeuProtocolo.Protocolo;
+import services.banco.Banco;
 
 public class UDPServer {
 	Banco banco = new Banco();
+	String reply= "";
+	DatagramSocket serverSocket = null;
 	
 	public UDPServer(int porta) throws Exception{
-		
+	
 
-		DatagramSocket serverSocket = null;
-		String reply= "";
-
-		System.out.println("UDP Server Started...");
+		System.out.println("Servidor UDP inicializado...");
 		System.out.println("Ouvindo na porta: "+porta);
 
 		try {
@@ -19,6 +23,8 @@ public class UDPServer {
 			//criarContasTeste();
 
 			serverSocket = new DatagramSocket(porta);
+
+			ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
 			while (true) {
 
@@ -34,19 +40,32 @@ public class UDPServer {
 
 				String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem(message);
 
+				executor.submit(()->{
+				long threadName = Thread.currentThread().threadId();
+				// Exibe a mensagem recebida e a thread que está processando
+				// System.out.println("Thread atual: " + Thread.currentThread().threadId() + " - Mensagem recebida de " + receivePacket.getAddress() + ":" + receivePacket.getPort() + " - " + message);
+
 				try {
 					banco.executarOperacao(operacoBancaria);
-					reply = banco.mensagemSaida == "" ? "Comando Não Reconhecido":banco.mensagemSaida;
+					reply = banco.mensagemSaida == "" ? "Comando Não Reconhecido":"Thread:"+threadName+": "+banco.mensagemSaida;
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					reply = e.getMessage();
+					reply = "Thread:"+threadName+": "+e.getMessage();
 				}
 
-				banco.getContas().values().stream().forEach(System.out::println); 
+				//banco.getContas().values().stream().forEach(System.out::println); 
 
 				byte[] replymsg = reply.getBytes();
 				DatagramPacket sendPacket = new DatagramPacket(replymsg,replymsg.length,receivePacket.getAddress(),receivePacket.getPort());
-				serverSocket.send(sendPacket);
+				
+				try {
+					serverSocket.send(sendPacket);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			});	
 			}
 		}catch (IOException e) {
 				e.printStackTrace();

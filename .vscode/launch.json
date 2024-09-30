@@ -6,6 +6,34 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Kvstore",
+            "request": "launch",
+            "mainClass": "WAL.Kvstore",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "testes.Main",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "Person",
+            "request": "launch",
+            "mainClass": "Person",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "Database",
+            "request": "launch",
+            "mainClass": "Database",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
             "name": "Banco",
             "request": "launch",
             "mainClass": "Banco",
