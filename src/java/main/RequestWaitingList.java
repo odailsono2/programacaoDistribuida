@@ -2,11 +2,11 @@
 import java.util.concurrent.*;
 import java.util.*;
 
-public class RequestWaitingList <Key, Response> {
+public class RequestWaitingList<Key, Response> {
     private Map<Key, CallbackDetails> pendingRequests = new ConcurrentHashMap<>();
 
     public void add(Key key, RequestCallback<Response> callback) {
-        
+
         pendingRequests.put(key, new CallbackDetails(callback, System.nanoTime()));
     }
 
@@ -17,21 +17,21 @@ public class RequestWaitingList <Key, Response> {
         }
 
         CallbackDetails callbackDetails = pendingRequests.remove(key);
-        
+
         ((RequestCallback) callbackDetails.getRequestCallback()).onResponse(response);
 
     }
 
-     public void handleError(int requestId, Throwable e) {
+    public void handleError(int requestId, Throwable e) {
 
         CallbackDetails callbackDetails = pendingRequests.remove(requestId);
         ((RequestCallback<Response>) callbackDetails.getRequestCallback()).onError(e);
-        
-     }
+
+    }
 
 }
 
-class CallbackDetails<RequestCallback>{
+class CallbackDetails<RequestCallback> {
     RequestCallback requestCallback;
     long createTime;
 
@@ -50,6 +50,10 @@ class CallbackDetails<RequestCallback>{
 
 }
 
-class Response{
+class Response {
+    String response;
 
+    public Response(String response) {
+        this.response = response;
+    }
 }

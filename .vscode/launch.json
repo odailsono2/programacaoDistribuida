@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Banco",
+            "request": "launch",
+            "mainClass": "services.banco.Banco",
+            "projectName": "programacaoDistribuida_af1e3394"
+        },
+        {
+            "type": "java",
             "name": "Kvstore",
             "request": "launch",
             "mainClass": "WAL.Kvstore",
