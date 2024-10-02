@@ -15,7 +15,7 @@ public class UDPServer {
 	public UDPServer(int porta) throws Exception{
 	
 
-		System.out.println("Servidor UDP inicializado...");
+		System.out.println("Servidor UDP inicializado ...");
 		System.out.println("Ouvindo na porta: "+porta);
 
 		try {
