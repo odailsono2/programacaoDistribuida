@@ -6,6 +6,34 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ClientConnectionMaker",
+            "request": "launch",
+            "mainClass": "ClientConnectionMaker",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "ClientConnectionBuilder",
+            "request": "launch",
+            "mainClass": "ClientConnectionBuilder",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "UDPserveRWL",
+            "request": "launch",
+            "mainClass": "UDPserveRWL",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "UDPClient",
+            "request": "launch",
+            "mainClass": "UDPClient",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
             "name": "Banco",
             "request": "launch",
             "mainClass": "services.banco.Banco",

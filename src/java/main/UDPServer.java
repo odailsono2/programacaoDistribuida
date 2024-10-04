@@ -1,6 +1,9 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -11,6 +14,8 @@ public class UDPServer {
 	Banco banco = new Banco();
 	String reply= "";
 	DatagramSocket serverSocket = null;
+
+	List<Client> connectedClients = new ArrayList<>(); 
 	
 	public UDPServer(int porta) throws Exception{
 	
@@ -36,30 +41,32 @@ public class UDPServer {
 				
 				String message = new String(receivePacket.getData());
 
-				//System.out.println("Received from client: [" + message+ "]\nFrom: " + receivePacket.getAddress()+":"+receivePacket.getPort());
 
 				String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem(message);
 
 				executor.submit(()->{
 				long threadName = Thread.currentThread().threadId();
-				// Exibe a mensagem recebida e a thread que está processando
-				// System.out.println("Thread atual: " + Thread.currentThread().threadId() + " - Mensagem recebida de " + receivePacket.getAddress() + ":" + receivePacket.getPort() + " - " + message);
 
 				try {
 					banco.executarOperacao(operacoBancaria);
 					reply = banco.mensagemSaida == "" ? "Comando Não Reconhecido":"Thread:"+threadName+": "+banco.mensagemSaida;
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					reply = "Thread:"+threadName+": "+e.getMessage();
 				}
 
 				//banco.getContas().values().stream().forEach(System.out::println); 
 
-				byte[] replymsg = reply.getBytes();
-				DatagramPacket sendPacket = new DatagramPacket(replymsg,replymsg.length,receivePacket.getAddress(),receivePacket.getPort());
+				// byte[] replymsg = reply.getBytes();
+				// DatagramPacket sendPacket = new DatagramPacket(replymsg,replymsg.length,receivePacket.getAddress(),receivePacket.getPort());
+				
+				connectedClients.add(new Client(receivePacket));
+
+				
 				
 				try {
-					serverSocket.send(sendPacket);
+					StringRequest request = new StringRequest(RequestId.GetValueRequest, reply.getBytes());
+					RequestOrResponse req = new RequestOrResponse(request, 1);
+					serverSocket.send(connectedClients.get(0).respond(req));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -85,6 +92,7 @@ public class UDPServer {
         banco.criar("3");
 	}
 	public static void main(String[] args) { 
+
 			try {
 				new UDPServer(8080);
 			} catch (Exception e) {
@@ -93,4 +101,28 @@ public class UDPServer {
 			}   
 			
 		}
+}
+
+class Client{
+
+	private int port;
+	private InetAddress adress;
+
+	Client(DatagramPacket clientReceivedPacket){
+		port = clientReceivedPacket.getPort();
+		adress = clientReceivedPacket.getAddress();
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public InetAddress getAdress() {
+		return adress;
+	}
+
+	public DatagramPacket respond(RequestOrResponse reply){
+		byte[] replymsg = reply.getRequest().getData();
+		return new DatagramPacket(replymsg,replymsg.length,adress,port);
+	}
 }
