@@ -1,19 +1,26 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.UnknownHostException;
+import java.net.InetAddress;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.ArrayList;
 import java.util.List;
 
-import Protocolos.MeuProtocolo.Protocolo;
-
 public class UDPserveRWL {
+
 	String reply= "";
-	// DatagramSocket serverSocket = null;
-	List<ClientConnection> conexoes = new ArrayList<>();
 	
+	List<ClientConnection> conexoes = new ArrayList<>();
+
+	RequestWaitingList<Integer, RequestOrResponse> requestWaitingList = new RequestWaitingList<>();
+
+	List<Node> clustersNodes = new ArrayList<>();
+
+	private Integer correlationID = 0;
+	private Integer requestID = 0;
+
 	public UDPserveRWL(int porta) throws Exception{
 	
 
@@ -35,11 +42,15 @@ public class UDPserveRWL {
 				serverSocket.receive(receivePacket);
 				
 				String message = new String(receivePacket.getData());
+				StringRequest requestComID = new StringRequest(requestID, receivePacket.getData());
+				Client clientConnection = new Client(receivePacket);
+				upRequestID();
+
+
 
 				System.out.println("Received from client: [" + message+ "]\nFrom: " + receivePacket.getAddress().toString()+":"+receivePacket.getPort());
 				
 
-				String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem(message);
 
 				executor.submit(()->{
 
@@ -48,17 +59,34 @@ public class UDPserveRWL {
 					System.out.println("Thread atual: " + threadName + " - Mensagem recebida de " + conexoes.get(0).getAddress() + ":" + conexoes.get(0).getPort() + " - " + message);
 
 			
-					//banco.getContas().values().stream().forEach(System.out::println); 
+					clustersNodes.forEach(
+						(node)->{
+			
+							int correlationID = nextCorrelationID();
 
-					byte[] replymsg = reply.getBytes();
-					DatagramPacket sendPacket = new DatagramPacket(replymsg,replymsg.length,receivePacket.getAddress(),receivePacket.getPort());
-					
-				try {
-					serverSocket.send(sendPacket);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+							RequestOrResponse requestComCorrelationID = new RequestOrResponse(requestComID, correlationID);
+
+							RequestCallback<RequestOrResponse> writeQuorumCallback = new WriteQuorumCallback(clustersNodes.size(), 
+																												requestComCorrelationID, 
+																												clientConnection);
+
+							requestWaitingList.add(correlationID, writeQuorumCallback);
+							
+							// Cria um socket UDP para enviar e receber pacotes
+							DatagramSocket socket = new DatagramSocket();
+
+							// Endereço do servidor (localhost no caso)
+							InetAddress serverAddress = node.getAddress();
+							int serverPort = node.getPort(); // Porta que o servidor está escutando
+
+
+							// Cria um pacote UDP para enviar a mensagem ao servidor
+							DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
+							socket.send(sendPacket); // Envia o pacote
+							
+
+						}
+					);
 				
 			});	
 			}
@@ -70,6 +98,13 @@ public class UDPserveRWL {
 
 	}
 
+	public Integer nextCorrelationID(){
+		return correlationID++;
+	}
+
+	public Integer upRequestID(){
+		return requestID ++ ; 
+	}
 
 	public static void main(String[] args) { 
 

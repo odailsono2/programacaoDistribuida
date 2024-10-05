@@ -1,5 +1,3 @@
-import java.io.IOException;
-
 class WriteQuorumCallback
         implements RequestCallback<RequestOrResponse> {
 
@@ -41,16 +39,14 @@ class WriteQuorumCallback
     }
 
     private void respondToClient(String response) {
-        clientConnection.respond(new RequestOrResponse(
-                                    new StringRequest(
-                                        RequestId.SetValueResponse, 
-                                        response.getBytes()),
-                                    request.getCorrelationId()));   
+        StringRequest requestTest= new StringRequest(1,response.getBytes());
+        RequestOrResponse reqRespTest = new RequestOrResponse(requestTest,1);
+        clientConnection.respond(reqRespTest);   
     }
 
 }
 
-
+// classe usada para encapsular os dados da requisição do clinete com um ID de mensagens entre servidores
 class RequestOrResponse {
     private StringRequest request;
     private int correlationId;
@@ -68,30 +64,28 @@ class RequestOrResponse {
         return correlationId;
     }
 
-    // Converte o RequestOrResponse em bytes para envio
-    public byte[] toBytes() {
-        byte[] requestBytes = request.toBytes();
-        byte[] correlationIdBytes = Integer.toString(correlationId).getBytes();
-        
-        // Combina os dados da requisição com o ID de correlação
-        byte[] result = new byte[requestBytes.length + correlationIdBytes.length];
-        System.arraycopy(requestBytes, 0, result, 0, requestBytes.length);
-        System.arraycopy(correlationIdBytes, 0, result, requestBytes.length, correlationIdBytes.length);
-        
-        return result;
-    }
+        // Converte o StringRequest em um array de bytes (pode incluir requestId + data)
+        public byte[] toBytes() {
+            byte[] requestIdBytes = Integer.toString(requestId).getBytes();
+            byte[] result = new byte[requestIdBytes.length + data.length];
+            System.arraycopy(requestIdBytes, 0, result, 0, requestIdBytes.length);
+            System.arraycopy(data, 0, result, requestIdBytes.length, data.length);
+            return result;
+        }
+
 }
 
+// Classe com a requisição do cliente: id da requisição o dados enviados
 class StringRequest {
-    private RequestId requestId;
+    private int requestId;
     private byte[] data;
 
-    public StringRequest(RequestId requestId, byte[] data) {
+    public StringRequest(int requestId, byte[] data) {
         this.requestId = requestId;
         this.data = data;
     }
 
-    public RequestId getRequestId() {
+    public int getRequestId() {
         return requestId;
     }
 
@@ -101,8 +95,7 @@ class StringRequest {
 
     // Converte o StringRequest em um array de bytes (pode incluir requestId + data)
     public byte[] toBytes() {
-        // Exemplo simples, em um caso real, você pode querer serializar de forma mais elaborada
-        byte[] requestIdBytes = requestId.name().getBytes();
+        byte[] requestIdBytes = Integer.toString(requestId).getBytes();
         byte[] result = new byte[requestIdBytes.length + data.length];
         System.arraycopy(requestIdBytes, 0, result, 0, requestIdBytes.length);
         System.arraycopy(data, 0, result, requestIdBytes.length, data.length);

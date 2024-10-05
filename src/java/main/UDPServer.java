@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -64,7 +63,7 @@ public class UDPServer {
 				
 				
 				try {
-					StringRequest request = new StringRequest(RequestId.GetValueRequest, reply.getBytes());
+					StringRequest request = new StringRequest(1, reply.getBytes());
 					RequestOrResponse req = new RequestOrResponse(request, 1);
 					serverSocket.send(connectedClients.get(0).respond(req));
 				} catch (IOException e) {
@@ -101,28 +100,4 @@ public class UDPServer {
 			}   
 			
 		}
-}
-
-class Client{
-
-	private int port;
-	private InetAddress adress;
-
-	Client(DatagramPacket clientReceivedPacket){
-		port = clientReceivedPacket.getPort();
-		adress = clientReceivedPacket.getAddress();
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public InetAddress getAdress() {
-		return adress;
-	}
-
-	public DatagramPacket respond(RequestOrResponse reply){
-		byte[] replymsg = reply.getRequest().getData();
-		return new DatagramPacket(replymsg,replymsg.length,adress,port);
-	}
 }

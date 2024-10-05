@@ -2,22 +2,22 @@
 import java.util.concurrent.*;
 import java.util.*;
 
-public class RequestWaitingList<Key, Response> {
+public class RequestWaitingList<TKey, TResponse> {
     
-    private Map<Key, CallbackDetails<Response>> pendingRequests = new ConcurrentHashMap<>();
+    private Map<TKey, CallbackDetails<TResponse>> pendingRequests = new ConcurrentHashMap<>();
 
-    public void add(Key key, RequestCallback<Response> callback) {
+    public void add(TKey key, RequestCallback<TResponse> callback) {
 
         pendingRequests.put(key, new CallbackDetails<>(callback, System.nanoTime()));
     }
 
-    public void handleResponse(Key key, Response response) throws Exception {
+    public void handleResponse(TKey key, TResponse response) throws Exception {
 
         if (!pendingRequests.containsKey(key)) {
             return;
         }
 
-        CallbackDetails<Response> callbackDetails = pendingRequests.remove(key);
+        CallbackDetails<TResponse> callbackDetails = pendingRequests.remove(key);
 
         if (callbackDetails != null) {
             callbackDetails.getRequestCallback().onResponse(response);
@@ -27,8 +27,9 @@ public class RequestWaitingList<Key, Response> {
 
     }
 
-    public void handleError(Key key, Throwable e) throws Exception {
-        CallbackDetails<Response> callbackDetails = pendingRequests.remove(key);
+    public void handleError(TKey key, Throwable e) throws Exception {
+        
+        CallbackDetails<TResponse> callbackDetails = pendingRequests.remove(key);
 
         // Verifica se existe um callback para essa chave
         if (callbackDetails != null) {
