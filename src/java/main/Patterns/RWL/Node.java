@@ -4,14 +4,24 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Node implements ServerNode {
+    private int Idservidor;
     private InetAddress adress;
     private int port;
 
-    public Node(){}
+    public Node() {
+    }
 
     public Node(InetAddress adress, int port) {
         this.adress = adress;
         this.port = port;
+    }
+
+    public int getIdservidor() {
+        return Idservidor;
+    }
+
+    public void setIdservidor(int idservidor) {
+        Idservidor = idservidor;
     }
 
     @Override
@@ -22,6 +32,7 @@ public class Node implements ServerNode {
     public int getPort() {
         return port;
     }
+
     @Override
     public void setAdress(String adress) {
 
@@ -30,15 +41,12 @@ public class Node implements ServerNode {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        
-        
+
     }
 
     @Override
     public void setPort(int port) {
         this.port = port;
     }
-
-    
 
 }

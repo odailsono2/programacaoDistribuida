@@ -3,9 +3,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import Patterns.RWL.RequestOrResponse;
-import Patterns.RWL.StringRequest;
-
 public class UDPClient {
 
     public static void main(String[] args) {
@@ -19,14 +16,15 @@ public class UDPClient {
             int serverPort = 8080; // Porta que o servidor está escutando
 
             // Mensagem que o cliente deseja enviar
-            String messagemInicial = "criar;1";
+            String message = "criar;1";
 
-            RequestOrResponse message = new RequestOrResponse(new StringRequest(1, messagemInicial.getBytes()), 2);
+            // RequestOrResponse message = new RequestOrResponse(new StringRequest(1,
+            // messagemInicial.getBytes()), 2);
 
+            // var msgSerializar = new SerializaMensagem<RequestOrResponse>();
+            // byte[] sendData = msgSerializar.serializar(message).toByteArray();
+            byte[] sendData = message.getBytes();
 
-            var msgSerializar = new SerializaMensagem<RequestOrResponse>();
-            byte[] sendData = msgSerializar.serializar(message).toByteArray();
-                            
             // Cria um pacote UDP para enviar a mensagem ao servidor
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
             socket.send(sendPacket); // Envia o pacote
@@ -35,13 +33,16 @@ public class UDPClient {
             byte[] receiveData = new byte[1024];
 
             // Pacote UDP para receber a resposta
-            DatagramPacket reponsePacket = new DatagramPacket(receiveData, receiveData.length);
-            socket.receive(reponsePacket); // Aguarda a resposta do servidor
+            DatagramPacket responsePacket = new DatagramPacket(receiveData, receiveData.length);
+            socket.receive(responsePacket); // Aguarda a resposta do servidor
 
             // Converte a resposta em String e exibe
-           // String serverResponse = new String(receivePacket.getData(), 0, receivePacket.getLength());
-            RequestOrResponse serverResponse = (RequestOrResponse) msgSerializar.deserializar(reponsePacket.getData());
-            System.out.println("Resposta do servidor: " + new String(serverResponse.getRequest().getData())+" : porta "+ socket.getLocalPort());
+            // String serverResponse = new String(receivePacket.getData(), 0,
+            // receivePacket.getLength());
+            // RequestOrResponse serverResponse = (RequestOrResponse)
+            // msgSerializar.deserializar(reponsePacket.getData());
+            System.out.println("Resposta do servidor:" + responsePacket.getAddress().getHostAddress() + ":"
+                    + responsePacket.getPort() + " , mensagem: " + new String(responsePacket.getData()));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,4 +54,3 @@ public class UDPClient {
         }
     }
 }
-
