@@ -2,6 +2,8 @@ package services.banco;
 
 import java.util.HashMap;
 
+import org.junit.internal.runners.statements.ExpectException;
+
 public class Banco {
 
     private HashMap<String, Conta> contas = new HashMap<>();
@@ -50,7 +52,7 @@ public class Banco {
                     + ", Valor: " + valor;
 
         } catch (Exception e) {
-            throw new Exception("Transferencia Erro: " + e.getMessage());
+            throw new Exception("Erro de Transferencia: " + e.getMessage());
         }
 
     }
@@ -62,7 +64,7 @@ public class Banco {
             contas.get(id).depositar(valor);
             mensagemSaida = "Deposito Realizado: Saldo da Conta " + id + ": " + contas.get(id).getSaldo();
         } catch (Exception e) {
-            throw new Exception("Deposito Erro: " + e.getMessage());
+            throw new Exception("Erro de Deposito: " + e.getMessage());
         }
     }
 
@@ -95,12 +97,12 @@ public class Banco {
 
                 getSaldo(operacoBancaria[1]);
 
-                ;
-
                 break;
 
             default:
-                break;
+
+                throw new Exception("Erro: comando inválido");
+            // break;
         }
     }
 
@@ -121,7 +123,7 @@ public class Banco {
     }
 
     public void testaSaldoSuficiente(String id, double valor) throws Exception {
-        if (contas.get(id).getSaldo() > valor) {
+        if (contas.get(id).getSaldo() >= valor) {
             return;
         } else {
             throw new Exception("Saldo Insuficiente!");

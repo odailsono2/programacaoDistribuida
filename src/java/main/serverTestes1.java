@@ -6,10 +6,14 @@ import java.util.concurrent.Executors;
 
 import Patterns.RWL.RequestOrResponse;
 import Patterns.RWL.StringRequest;
+import Protocolos.MeuProtocolo.Protocolo;
+import services.banco.Banco;
 
 public class serverTestes1 {
 
 	DatagramSocket serverSocket = null;
+
+	Banco banco = new Banco();
 
 	private int porta;
 
@@ -28,7 +32,6 @@ public class serverTestes1 {
 
 			serverSocket = new DatagramSocket(porta);
 
-			@SuppressWarnings("preview")
 			ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
 			while (true) {
@@ -38,11 +41,6 @@ public class serverTestes1 {
 				DatagramPacket receivePacket = new DatagramPacket(receiveMessage, receiveMessage.length);
 
 				serverSocket.receive(receivePacket);
-
-				// String message = new String(receivePacket.getData());
-
-				// String[] operacoBancaria =
-				// Protocolo.getProtocolo().processarMensagem(message);
 
 				executor.submit(() -> {
 					// long threadName = Thread.currentThread().threadId();
@@ -55,10 +53,25 @@ public class serverTestes1 {
 						System.out.println("Vindo do gateway:");
 						System.out.println(req);
 
-						String messagemReposta = ">>Servidor 1, recebi isso de vc: "
-								+ new String(req.getRequest().getData());
+						// String messagemReposta = ">>Servidor 1, recebi isso de vc: "+ new
+						// String(req.getRequest().getData());
 
-						var sendData = messagemReposta.getBytes();
+						String message = new String(receivePacket.getData());
+
+						String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem(message);
+
+						try {
+							banco.executarOperacao(operacoBancaria);
+						} catch (Exception e) {
+							var error = e.getMessage().getBytes();
+							DatagramPacket sendPacket = new DatagramPacket(error, error.length,
+									receivePacket.getAddress(), receivePacket.getPort());
+
+							serverSocket.send(sendPacket); // Envia o pacote
+
+						}
+
+						var sendData = banco.mensagemSaida.getBytes(); // messagemReposta.getBytes();
 
 						// Cria um pacote UDP para enviar a mensagem ao servidor
 						DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,

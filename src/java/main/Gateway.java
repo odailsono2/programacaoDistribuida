@@ -1,7 +1,5 @@
 import Patterns.RWL.Node;
 import Patterns.RWL.Nodemaker;
-import Patterns.RWL.RequestOrResponse;
-import Patterns.RWL.StringRequest;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -12,6 +10,11 @@ import java.net.*;
 public class Gateway {
 
     DatagramSocket serverSocket = null;
+
+    ServerSocket serverTCP = null;
+
+    String TCP = "";
+
     private int porta;
     List<Node> servidores;
 
@@ -22,9 +25,21 @@ public class Gateway {
 
     public void inicializar() {
 
-        System.out.println("Gatway iniciado na porta:" + porta);
+        System.out.println("Gateway iniciado na porta:" + porta);
 
         try {
+
+            if (TCP.contentEquals("TCP")) {
+                serverTCP = new ServerSocket(porta);
+                Socket nextClient = serverTCP.accept();
+                ObjectInputStream input = new ObjectInputStream(nextClient.getInputStream());
+                try {
+                    String msg = (String) input.readObject();
+                } catch (ClassNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
 
             // criarContasTeste();
 

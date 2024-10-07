@@ -16,7 +16,7 @@ public class UDPClient {
             int serverPort = 8080; // Porta que o servidor está escutando
 
             // Mensagem que o cliente deseja enviar
-            String message = "criar;1";
+            String message = "saldo;2";
 
             // RequestOrResponse message = new RequestOrResponse(new StringRequest(1,
             // messagemInicial.getBytes()), 2);
