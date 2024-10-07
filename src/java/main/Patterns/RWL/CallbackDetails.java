@@ -1,3 +1,4 @@
+package Patterns.RWL;
 
 public class CallbackDetails<Response> {
     private final RequestCallback<Response> requestCallback;

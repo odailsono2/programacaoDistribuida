@@ -6,6 +6,55 @@
     "configurations": [
         {
             "type": "java",
+            "name": "serverTestes2",
+            "request": "launch",
+            "mainClass": "serverTestes2",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "Gateway",
+            "request": "launch",
+            "mainClass": "Gateway",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "Gataway",
+            "request": "launch",
+            "mainClass": "Gataway",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "ClientConnectionMaker",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.ClientConnectionMaker",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "UDPTestes",
+            "request": "launch",
+            "mainClass": "UDPTestes",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "serverTestes1",
+            "request": "launch",
+            "mainClass": "serverTestes1",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "RequestOrResponse",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.RequestOrResponse",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
             "name": "ClientConnectionMaker",
             "request": "launch",
             "mainClass": "ClientConnectionMaker",

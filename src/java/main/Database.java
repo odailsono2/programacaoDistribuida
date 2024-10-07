@@ -3,8 +3,8 @@
 import java.io.IOException;
 import java.util.List;
 
-import WAL.LogEntry;
-import WAL.WriteAheadLog;
+import Patterns.WAL.LogEntry;
+import Patterns.WAL.WriteAheadLog;
 
 public class Database {
     private WriteAheadLog wal;

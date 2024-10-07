@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import Patterns.RWL.Client;
+import Patterns.RWL.RequestOrResponse;
+import Patterns.RWL.StringRequest;
 import Protocolos.MeuProtocolo.Protocolo;
 import services.banco.Banco;
 
@@ -93,7 +96,7 @@ public class UDPServer {
 	public static void main(String[] args) { 
 
 			try {
-				new UDPServer(8080);
+				new UDPServer(8081);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

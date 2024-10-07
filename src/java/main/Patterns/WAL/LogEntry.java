@@ -1,4 +1,4 @@
-package WAL;
+package Patterns.WAL;
 
 import java.io.Serializable;
 

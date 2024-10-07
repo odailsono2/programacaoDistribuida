@@ -1,3 +1,4 @@
+package Patterns.RWL;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -5,6 +6,8 @@ import java.net.UnknownHostException;
 public class Node implements ServerNode {
     private InetAddress adress;
     private int port;
+
+    public Node(){}
 
     public Node(InetAddress adress, int port) {
         this.adress = adress;

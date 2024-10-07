@@ -1,4 +1,4 @@
-package WAL;
+package Patterns.WAL;
 
 import java.util.HashMap;
 import java.util.Map;

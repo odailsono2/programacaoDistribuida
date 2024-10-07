@@ -1,3 +1,4 @@
+package Patterns.RWL;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -5,13 +6,11 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-class ClientConnection {
+public class ClientConnection {
     private InetAddress address;
     private int porta;
     private DatagramPacket datagramPacket;
     private DatagramSocket socketClient;
-
-    // DatagramPacket sendPacket = new DatagramPacket(replymsg,replymsg.length,receivePacket.getAddress(),receivePacket.getPort());
 
 
     public void setPorta(final int porta) {
@@ -31,6 +30,7 @@ class ClientConnection {
         this.address = InetAddress.getByName(address);
     }
 
+    /// não usar daqui pra baixo
     public void setDatagramPacket(final DatagramPacket datagramPacket) {
         this.datagramPacket = datagramPacket;
     }
@@ -70,68 +70,6 @@ class ClientConnection {
         return serverResponse;
         
 
-    }
-
-
-}
-
- 
-
-public class ClientConnectionMaker{
-
-    private final ClientConnection clientConnection;
-
-    
-    ClientConnectionMaker(){
-        clientConnection = new ClientConnection();
-    }
-
-    public ClientConnectionMaker setAdress(String address) throws Exception{
-        clientConnection.setAddress(address);
-        return this;
-    }
-
-    public ClientConnectionMaker setClientPort(final int porta){
-        clientConnection.setPorta(porta);
-        return this;
-    }
-
-    public ClientConnection getConection(){
-        return clientConnection;
-    }
-
-    public static void main(final String[] args) {
-
-        final var clientConnection = new ClientConnectionMaker();
-        var conexao = new ClientConnection();
-
-
-        try {
-                
-            conexao = clientConnection.setAdress("localhost").
-                                            setClientPort(8080).
-                                            getConection();
-
-            conexao.send("Ola Vc");
-            conexao.send("tudo bem");
-            
-            var serverResponse = conexao.receive();
-
-            System.out.println("Resposta do servidor: " + serverResponse+" : porta "+ conexao.getPort());
-
-        } catch (final IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }finally{
-            conexao.close();
-        }
-
-        
-                  
-            
     }
 
 
