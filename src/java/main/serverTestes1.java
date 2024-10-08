@@ -1,12 +1,15 @@
-import java.io.*;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import Patterns.RWL.Node;
 import Patterns.RWL.RequestOrResponse;
 import Patterns.RWL.StringRequest;
 import Protocolos.MeuProtocolo.Protocolo;
+import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import services.banco.Banco;
 
 public class serverTestes1 {
@@ -21,7 +24,9 @@ public class serverTestes1 {
 		this.porta = porta;
 	}
 
-	public void inicializar() throws Exception {
+	
+
+	public void inicializarUDP() throws Exception {
 
 		System.out.println("Servidor Teste 1 UDP inicializado ...");
 		System.out.println("Ouvindo na porta: " + porta);
@@ -53,8 +58,6 @@ public class serverTestes1 {
 						System.out.println("Vindo do gateway:");
 						System.out.println(req);
 
-						// String messagemReposta = ">>Servidor 1, recebi isso de vc: "+ new
-						// String(req.getRequest().getData());
 
 						String message = new String(receivePacket.getData());
 
@@ -99,15 +102,92 @@ public class serverTestes1 {
 		}
 	}
 
+	public void inicializarTCP() {
+
+		try (ServerSocket serverSocket = new ServerSocket(porta)) {
+            
+            ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+                
+            System.out.println("Servidor TCP esperando conexões na porta " + porta);
+            
+            while (true) {
+            
+                // Aceita uma conexão TCP
+                Socket clientSocket = serverSocket.accept();
+
+                executor.submit(()->{
+                    System.out.println("Cliente TCP conectado: " + clientSocket.getInetAddress());
+
+                    long threadName = Thread.currentThread().threadId();
+
+                    try{
+                        // Lê dados do cliente TCP
+                        BufferedReader inCliente = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                        PrintWriter outCliente = new PrintWriter(clientSocket.getOutputStream(), true);
+
+                        String receivedMessage = inCliente.readLine();
+
+                        System.out.println("Thread: " + threadName + ", Mensagem do cliente: " + receivedMessage);
+
+                        String message = new String(receivedMessage.getBytes());
+
+						String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem(message);
+
+						try {
+							banco.executarOperacao(operacoBancaria);
+						} catch (Exception e) {
+
+							outCliente.println(e.getMessage()); // Envia o pacote
+
+						}
+
+                       // Enviar uma resposta ao cliente TCP
+                        outCliente.println(banco.mensagemSaida);
+                        
+                        clientSocket.close();
+                    }catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    
+                });
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 	public static void main(String[] args) {
 
-		try {
-			var server = new serverTestes1(8081);
-			server.inicializar();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
+
+        // Criar threads virtuais para TCP e UDP
+	
+
+		serverTestes1 server = new serverTestes1(8081);
+
+
+		var udpFuture = virtualThreadExecutor.submit(() -> {
+						try {
+							server.inicializarUDP();
+						} catch (Exception ex) {
+							System.out.println(ex.getMessage());
+						}
+					});
+
+
+		var tcpFuture = virtualThreadExecutor.submit(() -> server.inicializarTCP());
+
+        // Verificar se a tarefa foi concluída e capturar exceções
+        try {
+            udpFuture.get(); // Bloqueia até que a tarefa seja concluída
+            tcpFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            System.out.println(e.getMessage()); // Captura e imprime qualquer erro
+        } 
 
 	}
+
+
 }

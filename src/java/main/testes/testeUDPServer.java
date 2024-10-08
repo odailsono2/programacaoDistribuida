@@ -1,3 +1,4 @@
+package testes;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,14 +13,14 @@ import Patterns.RWL.StringRequest;
 import Protocolos.MeuProtocolo.Protocolo;
 import services.banco.Banco;
 
-public class UDPServer {
+public class testeUDPServer {
 	Banco banco = new Banco();
 	String reply= "";
 	DatagramSocket serverSocket = null;
 
 	List<Client> connectedClients = new ArrayList<>(); 
 	
-	public UDPServer(int porta) throws Exception{
+	public testeUDPServer(int porta) throws Exception{
 	
 
 		System.out.println("Servidor UDP inicializado ...");
@@ -96,7 +97,7 @@ public class UDPServer {
 	public static void main(String[] args) { 
 
 			try {
-				new UDPServer(8081);
+				new testeUDPServer(8081);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

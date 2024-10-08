@@ -6,6 +6,34 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TCPClient",
+            "request": "launch",
+            "mainClass": "TCPClient",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "TCPserver",
+            "request": "launch",
+            "mainClass": "TCPserver",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "InterchangeableServerWithVirtualThreads",
+            "request": "launch",
+            "mainClass": "InterchangeableServerWithVirtualThreads",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "GatewayCOmUDP",
+            "request": "launch",
+            "mainClass": "GatewayCOmUDP",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
             "name": "UDPClient",
             "request": "launch",
             "mainClass": "UDPClient",

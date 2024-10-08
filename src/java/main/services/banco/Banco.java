@@ -2,7 +2,6 @@ package services.banco;
 
 import java.util.HashMap;
 
-import org.junit.internal.runners.statements.ExpectException;
 
 public class Banco {
 

@@ -1,9 +1,11 @@
+package testes;
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import serverTestes1;
 import Patterns.RWL.RequestOrResponse;
 import Patterns.RWL.StringRequest;
 
