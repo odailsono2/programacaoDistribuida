@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
@@ -11,16 +12,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // Classe para lidar com conexões TCP
-public class TCPserver{
+public class TCPServer{
 
 
-    public TCPserver(int porta, List<Node> servidoresExternos) {
+    public TCPServer(int porta, List<Node> servidoresExternos) {
 
         try (ServerSocket serverSocket = new ServerSocket(porta)) {
             
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
                 
-            System.out.println("Servidor TCP esperando conexões na porta " + porta);
+            System.out.println("Gateway TCP esperando conexões na porta " + porta);
             
             while (true) {
             
@@ -28,7 +29,7 @@ public class TCPserver{
                 Socket clientSocket = serverSocket.accept();
 
                 executor.submit(()->{
-                    System.out.println("Cliente TCP conectado: " + clientSocket.getInetAddress());
+                    System.out.println("(Gateway) Cliente TCP conectado: " + clientSocket.getInetAddress());
 
                     long threadName = Thread.currentThread().threadId();
 
@@ -39,7 +40,7 @@ public class TCPserver{
 
                         String receivedMessage = inCliente.readLine();
 
-                        System.out.println("Thread: " + threadName + ", Mensagem do cliente: " + receivedMessage);
+                        System.out.println("(Gateway) Thread: " + threadName + ", Mensagem do cliente: " + receivedMessage);
 
                         //encaminhando para servidores externos
 
@@ -60,7 +61,7 @@ public class TCPserver{
                                 System.out.println("Mensagem enviada para o servidor TCP.");
                     
                                 // Receber a resposta do servidor
-                                String receivedMessageFromServer = inServer.readLine();
+                                String receivedMessageFromServer = inServer.lines().reduce("",(a,b)->a+b);
                                 System.out.println("Resposta do servidor TCP: " + receivedMessageFromServer);
 
                                 respServidores = receivedMessageFromServer;
@@ -88,6 +89,8 @@ public class TCPserver{
             e.printStackTrace();
         }
     }
+
+   
 
     public static void main(String[] args) {
         // var tcp = new TCPserver(8082);

@@ -33,7 +33,7 @@ public class Gateway {
 
         System.out.println("Gateway TCP na porta:" + porta);
 
-        TCPserver servidorTCP = new TCPserver(porta, servidores);
+        TCPServer servidorTCP = new TCPServer(porta, servidores);
 
     }
 

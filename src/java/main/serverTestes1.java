@@ -16,6 +16,7 @@ public class serverTestes1 {
 
 	DatagramSocket serverSocket = null;
 
+
 	Banco banco = new Banco();
 
 	private int porta;
@@ -49,6 +50,7 @@ public class serverTestes1 {
 
 				executor.submit(() -> {
 					// long threadName = Thread.currentThread().threadId();
+
 
 					try {
 						// var msgSerializar = new SerializaMensagem<RequestOrResponse>();
@@ -104,6 +106,7 @@ public class serverTestes1 {
 
 	public void inicializarTCP() {
 
+
 		try (ServerSocket serverSocket = new ServerSocket(porta)) {
             
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
@@ -120,6 +123,11 @@ public class serverTestes1 {
 
                     long threadName = Thread.currentThread().threadId();
 
+					String mensagemSaidaThread = new String();
+
+					Boolean httpOn = false;
+
+
                     try{
                         // Lê dados do cliente TCP
                         BufferedReader inCliente = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -127,22 +135,49 @@ public class serverTestes1 {
 
                         String receivedMessage = inCliente.readLine();
 
+						if (receivedMessage != null && receivedMessage.startsWith("GET")){
+
+							httpOn = true;
+
+							var receivedMessageIsolada = receivedMessage.split(" ");
+							receivedMessage = receivedMessageIsolada[1].substring(1);
+						}
+
                         System.out.println("Thread: " + threadName + ", Mensagem do cliente: " + receivedMessage);
 
-                        String message = new String(receivedMessage.getBytes());
+                       // String message = new String(receivedMessage.getBytes());
 
-						String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem(message);
+						String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem(receivedMessage);
 
 						try {
 							banco.executarOperacao(operacoBancaria);
+
+							if (httpOn){
+
+								mensagemSaidaThread =  handleHTTP(receivedMessage, banco.mensagemSaida);
+
+							}
+							else{
+								mensagemSaidaThread = banco.mensagemSaida;
+							}
+
 						} catch (Exception e) {
 
-							outCliente.println(e.getMessage()); // Envia o pacote
+
+							if (httpOn){
+
+								outCliente.println(handleHTTP(receivedMessage, e.getMessage()));
+
+							}
+							else{
+								outCliente.println(e.getMessage());
+							}
+
 
 						}
-
+						System.out.println(mensagemSaidaThread);
                        // Enviar uma resposta ao cliente TCP
-                        outCliente.println(banco.mensagemSaida);
+                        outCliente.println(mensagemSaidaThread);
                         
                         clientSocket.close();
                     }catch (IOException e) {
@@ -156,6 +191,32 @@ public class serverTestes1 {
             e.printStackTrace();
         }
     }
+
+	private String handleHTTP(String requisicao, String respostaServico) throws IOException {
+		
+		StringBuilder respostaHTML = new StringBuilder();
+
+		var quebralinha = System.lineSeparator();
+
+            // Gera a resposta HTML
+            String responseBody =  "<html>" +
+								"<head><title>Banco Metrópole</title></head>" +
+								"<body><h1>Operacao: "+requisicao+"</h1>" +
+								"<p>"+respostaServico+"</p></body>" +
+								"</html>";
+
+            // Envia a resposta HTTP com o código de status 200 OK
+            respostaHTML.append("HTTP/1.1 200 OK").append(quebralinha);
+            respostaHTML.append("Content-Type: text/html; charset=UTF-8").append(quebralinha);
+            respostaHTML.append("Content-Length: " + responseBody.getBytes().length).append(quebralinha);
+            respostaHTML.append("").append(quebralinha); // Linha em branco separa os cabeçalhos do corpo
+            respostaHTML.append(responseBody); // Envia o corpo da resposta (HTML)
+
+		return respostaHTML.toString();
+
+    }
+
+
 
 	public static void main(String[] args) {
 

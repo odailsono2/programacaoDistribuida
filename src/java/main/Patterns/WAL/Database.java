@@ -1,10 +1,8 @@
+package Patterns.WAL;
 
 
 import java.io.IOException;
 import java.util.List;
-
-import Patterns.WAL.LogEntry;
-import Patterns.WAL.WriteAheadLog;
 
 public class Database {
     private WriteAheadLog wal;

@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TCPServer",
+            "request": "launch",
+            "mainClass": "TCPServer",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "HttpClient",
+            "request": "launch",
+            "mainClass": "HttpClient",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "MeuHTTP",
+            "request": "launch",
+            "mainClass": "Protocolos.MeuHTTP",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
             "name": "TCPClient",
             "request": "launch",
             "mainClass": "TCPClient",
