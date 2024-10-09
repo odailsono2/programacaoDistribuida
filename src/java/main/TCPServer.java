@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
@@ -17,7 +18,7 @@ public class TCPServer{
 
     public TCPServer(int porta, List<Node> servidoresExternos) {
 
-        try (ServerSocket serverSocket = new ServerSocket(porta)) {
+        try (ServerSocket serverSocket = new ServerSocket(porta,50,InetAddress.getByName("0.0.0.0"))) {
             
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
                 
@@ -30,6 +31,7 @@ public class TCPServer{
 
                 executor.submit(()->{
                     System.out.println("(Gateway) Cliente TCP conectado: " + clientSocket.getInetAddress());
+                    
 
                     long threadName = Thread.currentThread().threadId();
 
@@ -61,7 +63,14 @@ public class TCPServer{
                                 System.out.println("Mensagem enviada para o servidor TCP.");
                     
                                 // Receber a resposta do servidor
-                                String receivedMessageFromServer = inServer.lines().reduce("",(a,b)->a+b);
+                                StringBuilder construirMensagem = new StringBuilder();
+                                
+                                inServer.lines().forEach((linha)->{
+                                    construirMensagem.append(linha).append(System.lineSeparator());
+                                });
+
+                                String receivedMessageFromServer = construirMensagem.toString();
+
                                 System.out.println("Resposta do servidor TCP: " + receivedMessageFromServer);
 
                                 respServidores = receivedMessageFromServer;

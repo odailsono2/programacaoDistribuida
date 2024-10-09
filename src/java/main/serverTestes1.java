@@ -5,6 +5,7 @@ import Protocolos.MeuProtocolo.Protocolo;
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutionException;
@@ -107,7 +108,7 @@ public class serverTestes1 {
 	public void inicializarTCP() {
 
 
-		try (ServerSocket serverSocket = new ServerSocket(porta)) {
+		try (ServerSocket serverSocket = new ServerSocket(porta,50,InetAddress.getByName("0.0.0.0"))) {
             
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
                 
@@ -119,6 +120,7 @@ public class serverTestes1 {
                 Socket clientSocket = serverSocket.accept();
 
                 executor.submit(()->{
+					System.out.println("");
                     System.out.println("Cliente TCP conectado: " + clientSocket.getInetAddress());
 
                     long threadName = Thread.currentThread().threadId();
@@ -158,19 +160,23 @@ public class serverTestes1 {
 
 							}
 							else{
-								mensagemSaidaThread = banco.mensagemSaida;
+								mensagemSaidaThread = banco.mensagemSaida+System.lineSeparator();
 							}
 
 						} catch (Exception e) {
 
 
 							if (httpOn){
+								System.out.println(e.getMessage());
+
 
 								outCliente.println(handleHTTP(receivedMessage, e.getMessage()));
 
 							}
 							else{
-								outCliente.println(e.getMessage());
+								System.out.println(e.getMessage());
+
+								outCliente.println(e.getMessage()+System.lineSeparator());
 							}
 
 
@@ -201,8 +207,11 @@ public class serverTestes1 {
             // Gera a resposta HTML
             String responseBody =  "<html>" +
 								"<head><title>Banco Metrópole</title></head>" +
-								"<body><h1>Operacao: "+requisicao+"</h1>" +
-								"<p>"+respostaServico+"</p></body>" +
+								"<body>"+
+								"<h1>Banco Metrópole</h1>"+
+								"<p>Requisição: "+requisicao+"</p>" +
+								"<p>Resposta: "+respostaServico+"</p>"+
+								"</body>" +
 								"</html>";
 
             // Envia a resposta HTTP com o código de status 200 OK
