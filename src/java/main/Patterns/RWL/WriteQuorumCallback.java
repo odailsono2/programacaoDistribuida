@@ -1,4 +1,7 @@
 package Patterns.RWL;
+
+import java.io.IOException;
+
 public class WriteQuorumCallback
         implements RequestCallback<RequestOrResponse> {
 
@@ -26,7 +29,7 @@ public class WriteQuorumCallback
         receivedResponses++;
 
         if (receivedResponses == quorum && !done) {
-            respondToClient("Success");
+            respondToClient(new String(r.getRequest().getData()));
             done = true;
         }
     }
@@ -35,23 +38,50 @@ public class WriteQuorumCallback
     public void onError(Throwable e) {
         receivedErrors++;
         if (receivedErrors == quorum && !done) {
-            respondToClient("Error");
+            respondToClient(e.getMessage());
             done = true;
         }
     }
 
     private void respondToClient(String response) {
-        //StringRequest requestTest= new StringRequest(1,response.getBytes());
-        //RequestOrResponse reqRespTest = new RequestOrResponse(requestTest,1);
-        clientConnection.respond(request);   
+        // System.out.println(response);
+        StringRequest request= new StringRequest(RequestId.SetValueRequest.getValor(),response.getBytes());
+        RequestOrResponse reqResp = new RequestOrResponse(request,request.getCorrelationId());
+        try {
+            clientConnection.respond(reqResp.getRequest().getData());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }   
     }
 
 }
 
 enum RequestId {
-    SetValueRequest,
-    SetValueResponse,
-    GetValueRequest,
-    GetValueResponse;
+    SetValueRequest(1),
+    SetValueResponse(2),
+    GetValueRequest(3),
+    GetValueResponse(4);
+
+    private final int valor;
+
+    RequestId(int valor){
+        this.valor = valor;
+
+    }
+
+    public int getValor(){
+        return valor;
+    }
+
+        // Método para obter o enum pelo valor inteiro
+        public static RequestId fromValor(int valor) {
+            for (RequestId req : RequestId.values()) {
+                if (req.getValor() == valor) {
+                    return req;
+                }
+            }
+            throw new IllegalArgumentException("Valor inválido: " + valor);
+        }
 }
 

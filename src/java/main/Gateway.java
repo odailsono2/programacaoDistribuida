@@ -1,5 +1,8 @@
 import Patterns.RWL.Node;
 import Patterns.RWL.Nodemaker;
+import Patterns.RWL.RequestOrResponse;
+import Patterns.RWL.StringRequest;
+
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -40,21 +43,39 @@ public class Gateway {
 
     public static void main(String[] args) {
 
-        Node servedor1 = (new Nodemaker()).setAddress("localhost").setPort(8081).buideNode();
+        //Node servedor1 = (new Nodemaker()).setAddress("localhost").setPort(8081).buildNode();
 
-        // Node servedor2 = (new
-        // Nodemaker()).setAddress("localhost").setPort(8082).buideNode();
+        var address = "localhost";
+        Node node1 = new Node();
+        Node node2 = new Node();
 
-        // Node servedor3 = (new
-        // Nodemaker()).setAddress("localhost").setPort(8083).buideNode();
+        Node node3 = new Node();
+
+        try {
+            node1.setAddress(InetAddress.getByName(address));
+            node2.setAddress(InetAddress.getByName(address));
+            node3.setAddress(InetAddress.getByName(address));
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        node1.setPort(8081);
+        node2.setPort(8082);
+
+        node3.setPort(8083);
+        node1.setLider(true);
+
+
+        
+            
 
         List<Node> servidoresDisponiveis = new ArrayList<>();
 
-        servidoresDisponiveis.add(servedor1);
+        servidoresDisponiveis.add(node1);
 
-        // servidoresDisponiveis.add(servedor2);
+        servidoresDisponiveis.add(node2);
 
-        // servidoresDisponiveis.add(servedor3);
+        servidoresDisponiveis.add(node3);
 
         var gateway = new Gateway(8080, servidoresDisponiveis);
 

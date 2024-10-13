@@ -15,7 +15,7 @@ public class TCPClient {
             //String message = "criar;2";
             // String message = "depositar;2;3000";
             // String message = "transferir;1;2;530";
-             String message = "saldo;1";
+             String message = "criar;1";
 
             out.println(message);
             System.out.println("Mensagem enviada para o servidor TCP.");

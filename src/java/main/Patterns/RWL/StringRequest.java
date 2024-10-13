@@ -8,6 +8,7 @@ public class StringRequest implements Serializable {
     // private static final long serialVersionUID = 1L;
     private int requestId;
     private byte[] data;
+    private int correlationID;
 
     public StringRequest(int requestId, byte[] data) {
         this.requestId = requestId;
@@ -48,4 +49,9 @@ public class StringRequest implements Serializable {
     public String toString() {
         return "StringRequest [requestId=" + requestId + ", data=" + Arrays.toString(data) + "]";
     }
+
+    public int getCorrelationId() {
+        return correlationID;
+    }
+
 }

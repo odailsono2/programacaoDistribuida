@@ -6,6 +6,55 @@
     "configurations": [
         {
             "type": "java",
+            "name": "serverTestes3RWL",
+            "request": "launch",
+            "mainClass": "serverTestes3RWL",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "serverTestes2RWL",
+            "request": "launch",
+            "mainClass": "serverTestes2RWL",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "InicializaServidores",
+            "request": "launch",
+            "mainClass": "InicializaServidores",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "serverTestes1RWL",
+            "request": "launch",
+            "mainClass": "serverTestes1RWL",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "Node",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.Node",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "Client",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.Client",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "RequestWaitingList",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.RequestWaitingList",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
             "name": "TCPServer",
             "request": "launch",
             "mainClass": "TCPServer",

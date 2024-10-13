@@ -20,7 +20,7 @@ public class Nodemaker {
         return this;
     }
 
-    public Node buideNode(){
+    public Node buildNode(){
         return node;
     }
 

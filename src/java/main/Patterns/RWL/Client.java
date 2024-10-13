@@ -1,46 +1,108 @@
 package Patterns.RWL;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
+import java.io.*;
+import java.net.*;
 
 public class Client{
 
-	private int port;
-	private InetAddress adress;
-    private String request;
+	private int porta;
+	private InetAddress address;
+	private DatagramSocket clientDatagramSocket;
+	private Socket clientSocket;
+	private TypeConnection typeConnection;
 
-	public Client(DatagramPacket clientReceivedPacket){
-		port = clientReceivedPacket.getPort();
-		adress = clientReceivedPacket.getAddress();
-        request = clientReceivedPacket.getData().toString();
+	public Client(InetAddress address, int porta, String typeConnection){
+
+		this.address = address;
+
+		this.porta = porta;
+
+		this.typeConnection = TypeConnection.valueOf(typeConnection);
+	}
+	public void setTypeConnection(String typeConnection) {
+		this.typeConnection = TypeConnection.valueOf(typeConnection);
 	}
 
-    public String getRequest() {
-        return request;
-    }
+	public void setPorta(int porta) {
+		this.porta = porta;
+	}
+
+	public void setAdressByString(String address) throws UnknownHostException {
+		this.address = InetAddress.getByName(address);
+	}
+
+	public Client(DatagramSocket clientDatagramSocket){
+		this.clientDatagramSocket = clientDatagramSocket;
+
+
+	}
+
+	public Client(Socket clientSocket){
+		this.clientSocket = clientSocket;
+
+
+	}
 	public int getPort() {
-		return port;
+		return porta;
 	}
 
 	public InetAddress getAdress() {
-		return adress;
+		return address;
 	}
 
+	private void respondViaUDP(byte [] reply) throws IOException{
 
-	public DatagramPacket respond(RequestOrResponse reply){
+		clientDatagramSocket.send(new DatagramPacket(reply,reply.length,address,porta));
+
+	}
+
+	private void respondViaTCP(byte[] reply) throws IOException{
+
+
+		// System.out.println(new String(reply));
 		
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(byteArrayOutputStream))) {
-			objectOutputStream.writeObject(reply);
-		} catch (IOException e) {
-			e.printStackTrace();
+		ByteArrayOutputStream replyByteArrayOutputStream = new ByteArrayOutputStream();
+
+		replyByteArrayOutputStream.write(reply);
+
+
+		BufferedOutputStream out = new BufferedOutputStream(clientSocket.getOutputStream());
+
+     	replyByteArrayOutputStream.writeTo(out);
+
+		out.flush();
+
+		//out.close();
+
+
+
+	}
+
+	public void respond(byte[] reply) throws IOException{
+
+		switch (typeConnection) {
+			case TypeConnection.TCP:
+
+				respondViaTCP(reply);
+				
+				break;
+
+			case TypeConnection.UDP:
+
+				respondViaUDP(reply);
+				
+				break;
+		
+			default:
+				break;
 		}
-		byte[] replymsg = byteArrayOutputStream.toByteArray();
 
+	}
 
-		return new DatagramPacket(replymsg,replymsg.length,adress,port);
+	public static void main(String[] args) {
+		TypeConnection test = TypeConnection.valueOf("UDP");
+
+		System.out.println(test.name());
+		System.out.println(test.getValor());
 	}
 }
+

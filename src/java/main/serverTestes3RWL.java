@@ -1,6 +1,10 @@
+import Patterns.RWL.Client;
 import Patterns.RWL.Node;
+import Patterns.RWL.Nodemaker;
 import Patterns.RWL.RequestOrResponse;
+import Patterns.RWL.RequestWaitingList;
 import Patterns.RWL.StringRequest;
+import Patterns.RWL.WriteQuorumCallback;
 import Protocolos.MeuProtocolo.Protocolo;
 import java.io.*;
 import java.net.DatagramPacket;
@@ -11,18 +15,31 @@ import java.net.Socket;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.*;
+
+
 import services.banco.Banco;
 
-public class serverTestes1 {
+public class serverTestes3RWL {
 
-	DatagramSocket serverSocket = null;
+	private DatagramSocket serverSocket = null;
 
+	private volatile RequestWaitingList<Integer, RequestOrResponse> requestWaitingList = new RequestWaitingList<>();
+
+	private volatile List<Node> servers = new ArrayList<>();
 
 	Banco banco = new Banco();
 
-	private int porta;
+	public int porta;
 
-	public serverTestes1(int porta) {
+	private Boolean lider = false;
+
+
+	private int requestID = 0;
+
+	private volatile int correlationId = 0;
+
+	public serverTestes3RWL(int porta) {
 		this.porta = porta;
 	}
 
@@ -117,11 +134,13 @@ public class serverTestes1 {
             while (true) {
             
                 // Aceita uma conexão TCP
-                Socket clientSocket = serverSocket.accept();
+
+				Socket clientSocket = serverSocket.accept();
+
 
                 executor.submit(()->{
 					System.out.println("");
-                    System.out.println("Cliente TCP conectado: " + clientSocket.getInetAddress());
+                    System.out.println("Cliente TCP conectado: " + clientSocket.getInetAddress()+":"+clientSocket.getPort());
 
                     long threadName = Thread.currentThread().threadId();
 
@@ -133,9 +152,10 @@ public class serverTestes1 {
                     try{
                         // Lê dados do cliente TCP
                         BufferedReader inCliente = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                        PrintWriter outCliente = new PrintWriter(clientSocket.getOutputStream(), true);
+                       //  PrintWriter outCliente = new PrintWriter(clientSocket.getOutputStream(), true);
 
                         String receivedMessage = inCliente.readLine();
+						System.out.println("Thread "+threadName+" mensagem recebida "+receivedMessage);
 
 						if (receivedMessage != null && receivedMessage.startsWith("GET")){
 
@@ -145,9 +165,89 @@ public class serverTestes1 {
 							receivedMessage = receivedMessageIsolada[1].substring(1);
 						}
 
-                        System.out.println("Thread: " + threadName + ", Mensagem do cliente: " + receivedMessage);
 
-                       // String message = new String(receivedMessage.getBytes());
+
+						//----Preparando para RequestWaitingList
+						
+						var clientConnection = new Client(clientSocket);
+
+						clientConnection.setTypeConnection("TCP");
+
+						if (!lider){
+
+
+							try {
+								mensagemSaidaThread = executarOperacaoBancaria(receivedMessage, httpOn)+System.lineSeparator();
+
+								
+							} catch (Exception e) {
+								var erroBanco = e.getMessage()+System.lineSeparator();
+								clientConnection.respond(erroBanco.getBytes());
+
+							}
+
+							
+
+
+							clientConnection.respond(mensagemSaidaThread.getBytes());
+
+							
+
+							
+
+							
+						}
+
+						StringRequest requestWithID = createRequestsWithID(receivedMessage);
+
+						for (Node node : servers) {
+							System.out.println("Laço requestwaitinglist");
+
+							nextCorrelationId();
+
+							var requestToOtherServers = new RequestOrResponse(requestWithID, correlationId);
+
+							var callback = new WriteQuorumCallback(servers.size(),requestToOtherServers,clientConnection);
+
+							requestWaitingList.add(correlationId, callback);
+
+							try {
+
+								var mensagemRecebida = sendAndReceiveRequestOtherServers(receivedMessage.getBytes(), node);
+
+								RequestOrResponse responseCurrenteNodeRoQ = 
+														new RequestOrResponse(
+																new StringRequest(
+																	requestID, 
+																	mensagemRecebida.getBytes())
+																,correlationId);
+
+								requestWaitingList.handleResponse(correlationId, responseCurrenteNodeRoQ);
+
+								
+							} catch (Exception e) {
+
+								requestWaitingList.handleError(correlationId, e);
+
+							}		
+
+							
+
+							
+						}
+						
+						//-----Fim RequestWaitingList
+/* 
+						var responseCurrentNode = executarOperacaoBancaria(receivedMessage,httpOn);
+							
+						RequestOrResponse responseCurrenteNodeRoQ= new RequestOrResponse(new StringRequest(requestID, responseCurrentNode.getBytes()),correlationId);
+
+						requestWaitingList.handleResponse(correlationId, responseCurrenteNodeRoQ);
+
+						System.out.println("Thread: " + threadName + ", Mensagem do cliente: " + receivedMessage);
+
+						
+
 
 						String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem(receivedMessage);
 
@@ -181,14 +281,23 @@ public class serverTestes1 {
 
 
 						}
+							*/
 						System.out.println(mensagemSaidaThread);
                        // Enviar uma resposta ao cliente TCP
-                        outCliente.println(mensagemSaidaThread);
+                    //    outCliente.println(mensagemSaidaThread);
                         
                         clientSocket.close();
-                    }catch (IOException e) {
+                    }catch (Exception e) {
                         e.printStackTrace();
                     }
+					finally{
+						try {
+							clientSocket.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 
                     
                 });
@@ -198,7 +307,55 @@ public class serverTestes1 {
         }
     }
 
-	private String handleHTTP(String requisicao, String respostaServico) throws IOException {
+	private String executarOperacaoBancaria(String receivedMessage, Boolean httpOn) throws Exception {
+
+		String[] operacoBancaria = Protocolo.getProtocolo().processarMensagem(receivedMessage);
+
+		String mensagemSaida = new String(); 
+
+		try {
+			banco.executarOperacao(operacoBancaria);
+
+			if (httpOn){
+
+				mensagemSaida =  handleHTTP(receivedMessage, banco.mensagemSaida);
+
+			}
+			else{
+				mensagemSaida = banco.mensagemSaida + System.lineSeparator();
+			}
+
+
+		} catch (Exception e) {
+
+
+			if (httpOn){
+				System.out.println(e.getMessage());
+
+				mensagemSaida = handleHTTP(receivedMessage, e.getMessage());
+
+				//outCliente.println(handleHTTP(receivedMessage, e.getMessage()));
+
+			}
+			else{
+				System.out.println(e.getMessage());
+
+				mensagemSaida = e.getMessage() + System.lineSeparator();
+
+				//outCliente.println(e.getMessage()+System.lineSeparator());
+			}
+
+			throw new Exception(mensagemSaida);
+
+
+		}
+		return mensagemSaida;
+
+	}
+
+
+
+	private String handleHTTP(String requisicao, String respostaServico) {
 		
 		StringBuilder respostaHTML = new StringBuilder();
 
@@ -219,11 +376,73 @@ public class serverTestes1 {
             respostaHTML.append("Content-Type: text/html; charset=UTF-8").append(quebralinha);
             respostaHTML.append("Content-Length: " + responseBody.getBytes().length).append(quebralinha);
             respostaHTML.append("").append(quebralinha); // Linha em branco separa os cabeçalhos do corpo
-            respostaHTML.append(responseBody); // Envia o corpo da resposta (HTML)
+            respostaHTML.append(responseBody).append(quebralinha); // Envia o corpo da resposta (HTML)
 
 		return respostaHTML.toString();
 
     }
+
+	public StringRequest createRequestsWithID(String requestRecebida){
+
+		StringRequest novaRequest = new StringRequest(nextRequestId(), requestRecebida.getBytes());
+		return novaRequest;
+	
+	}
+
+	public RequestOrResponse createNewRequestWithCorrelationID(StringRequest novaRequest){
+
+		RequestOrResponse clientRequest = new RequestOrResponse(novaRequest, nextCorrelationId());
+
+		return clientRequest;
+		
+	}
+
+	public void handlRequestsWaitingList(RequestOrResponse novaRequestOrResponse, Client client, int quorum){
+
+		var callback = new WriteQuorumCallback(quorum, novaRequestOrResponse, client);
+
+		requestWaitingList.add(requestID, callback);
+
+
+	}
+
+	public void handleResponsesFromServers(Integer key, RequestOrResponse responseFromServer){
+
+		requestWaitingList.handleResponse(key, responseFromServer);
+	}
+
+	
+
+
+
+	private int nextCorrelationId() {
+
+		return correlationId ++;
+	}
+
+
+
+	private int nextRequestId() {
+		return requestID ++ ;
+	}
+
+	public String sendAndReceiveRequestOtherServers(byte [] request, Node node) throws IOException{
+		
+
+			node.makeSocket();
+
+			node.sendMessage(request);
+
+
+			var messageReceived = node.receiveMessage();
+
+
+			node.closeSocket();
+
+			return messageReceived;
+
+                                
+	}
 
 
 
@@ -235,10 +454,11 @@ public class serverTestes1 {
         // Criar threads virtuais para TCP e UDP
 	
 
-		serverTestes1 server = new serverTestes1(8081);
+		serverTestes3RWL server = new serverTestes3RWL(8083);
 
 
-		var udpFuture = virtualThreadExecutor.submit(() -> {
+
+		var udpFuture1 = virtualThreadExecutor.submit(() -> {
 						try {
 							server.inicializarUDP();
 						} catch (Exception ex) {
@@ -247,12 +467,12 @@ public class serverTestes1 {
 					});
 
 
-		var tcpFuture = virtualThreadExecutor.submit(() -> server.inicializarTCP());
+		var tcpFuture1 = virtualThreadExecutor.submit(() -> server.inicializarTCP());
 
         // Verificar se a tarefa foi concluída e capturar exceções
         try {
-            udpFuture.get(); // Bloqueia até que a tarefa seja concluída
-            tcpFuture.get();
+            udpFuture1.get(); // Bloqueia até que a tarefa seja concluída
+            tcpFuture1.get();
         } catch (InterruptedException | ExecutionException e) {
             System.out.println(e.getMessage()); // Captura e imprime qualquer erro
         } 
