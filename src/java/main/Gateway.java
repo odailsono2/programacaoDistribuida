@@ -1,7 +1,4 @@
 import Patterns.RWL.Node;
-import Patterns.RWL.Nodemaker;
-import Patterns.RWL.RequestOrResponse;
-import Patterns.RWL.StringRequest;
 
 import java.net.*;
 import java.util.*;
@@ -27,7 +24,7 @@ public class Gateway {
 
         System.out.println("Gateway UDP na porta:" + porta);
 
-        UDPserver servidorUDP = new UDPserver(porta, servidores);
+        new UDPserver(porta, servidores);
 
 
     }
@@ -36,7 +33,7 @@ public class Gateway {
 
         System.out.println("Gateway TCP na porta:" + porta);
 
-        TCPServer servidorTCP = new TCPServer(porta, servidores);
+        new TCPServer(porta, servidores);
 
     }
 

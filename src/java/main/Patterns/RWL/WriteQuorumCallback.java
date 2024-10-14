@@ -45,12 +45,11 @@ public class WriteQuorumCallback
 
     private void respondToClient(String response) {
         // System.out.println(response);
-        StringRequest request= new StringRequest(RequestId.SetValueRequest.getValor(),response.getBytes());
-        RequestOrResponse reqResp = new RequestOrResponse(request,request.getCorrelationId());
+        StringRequest requestlocal= new StringRequest(RequestId.SetValueRequest.getValor(),response.getBytes());
+        RequestOrResponse reqResp = new RequestOrResponse(requestlocal,request.getCorrelationId());
         try {
             clientConnection.respond(reqResp.getRequest().getData());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }   
     }

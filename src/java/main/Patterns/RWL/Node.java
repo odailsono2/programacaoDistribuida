@@ -116,15 +116,15 @@ public class Node implements ServerNode {
 
     public String receiveMessage() throws IOException{
          // Lê dados do cliente TCP
-         if (nodeSocket.isConnected()){
-            System.out.println("socket conectado");
-         }
+        //  if (nodeSocket.isConnected()){
+        //     System.out.println("socket conectado");
+        //  }
 
          BufferedReader inCliente = new BufferedReader(new InputStreamReader(nodeSocket.getInputStream()));
 
          StringBuilder mensagemRecebida = new StringBuilder(); 
 
-         System.out.println("Aguardando mensagem...");
+        //  System.out.println("Aguardando mensagem...");
 
     
          //String linha;

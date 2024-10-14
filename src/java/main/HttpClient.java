@@ -13,7 +13,7 @@ public class HttpClient {
 
             // Envia uma requisição HTTP GET ao servidor
             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-            writer.println("GET /criar;3 HTTP/1.1");
+            writer.println("GET /cliente:criar;3 HTTP/1.1");
             writer.println("Host: localhost");
             writer.println("Connection: close");
             writer.println(""); // Linha em branco para indicar o fim dos cabeçalhos

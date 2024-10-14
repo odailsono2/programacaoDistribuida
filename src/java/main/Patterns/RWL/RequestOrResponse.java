@@ -6,6 +6,10 @@ public class RequestOrResponse implements Serializable {
     // private static final long serialVersionUID = 1L;
     private StringRequest request;
     private int correlationId;
+    private String origemAddress;
+    private int origemPort;
+
+    public RequestOrResponse(){}
 
     public RequestOrResponse(StringRequest request, int correlationId) {
         this.request = request;
@@ -20,6 +24,22 @@ public class RequestOrResponse implements Serializable {
         return correlationId;
     }
 
+    public void setCorrelationId(int correlationId) {
+        this.correlationId = correlationId;
+    }
+    public void setOrigemAddress(String origemAddress) {
+        this.origemAddress = origemAddress;
+    }
+    public void setOrigemPort(int origemPort) {
+        this.origemPort = origemPort;
+    }
+    public String getOrigemAddress() {
+        return origemAddress;
+    }
+    public int getOrigemPort() {
+        return origemPort;
+    }
+    
     // Converte o StringRequest em um array de bytes (pode incluir requestId + data)
     public byte[] toBytes() {
 

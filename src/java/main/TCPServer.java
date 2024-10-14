@@ -19,7 +19,7 @@ public class TCPServer{
 
     public TCPServer(int porta, List<Node> servidoresExternos) {
 
-        try (ServerSocket serverSocket = new ServerSocket(porta,50,InetAddress.getByName("0.0.0.0"))) {
+        try (ServerSocket serverSocket = new ServerSocket(porta,1,InetAddress.getByName("127.0.0.1"))) {
             
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
                 

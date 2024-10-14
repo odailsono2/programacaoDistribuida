@@ -13,7 +13,7 @@ public class UDPClient {
 
             // Endereço do servidor (localhost no caso)
             InetAddress serverAddress = InetAddress.getByName("localhost");
-            int serverPort = 8080; // Porta que o servidor está escutando
+            int serverPort = 8081; // Porta que o servidor está escutando
 
             // Mensagem que o cliente deseja enviar
             String message = "criar;2";
