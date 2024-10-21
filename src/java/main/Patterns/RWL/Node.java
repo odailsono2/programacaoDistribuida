@@ -3,7 +3,7 @@ package Patterns.RWL;
 import java.net.*;
 import java.io.*;
 
-public class Node implements ServerNode {
+public class Node {
     private int Idservidor;
     private InetAddress address;
     private int port;
@@ -53,7 +53,7 @@ public class Node implements ServerNode {
         Idservidor = idservidor;
     }
 
-    @Override
+    
     public InetAddress getAddress() {
         return address;
     }
@@ -62,7 +62,7 @@ public class Node implements ServerNode {
         return port;
     }
 
-    @Override
+    
     public void setAdress(String address) {
 
         try {
@@ -73,7 +73,7 @@ public class Node implements ServerNode {
 
     }
 
-    @Override
+    
     public void setPort(int port) {
         this.port = port;
     }

@@ -16,7 +16,7 @@ public class Banco {
     public void getSaldo(String id) throws Exception {
 
         contaValida(id);
-        mensagemSaida = "Conta " + id + " saldo: " + contas.get(id).toString();
+        mensagemSaida = "Sucesso: Conta " + id + " saldo: " + contas.get(id).toString();
     }
 
     public void criar(String id) throws Exception {
@@ -34,7 +34,7 @@ public class Banco {
 
         contas.put(id, novaConta);
 
-        mensagemSaida = "Conta " + id + " criada com sucesso!";
+        mensagemSaida = "Sucesso: Conta " + id + " criada!";
 
     }
 
@@ -47,7 +47,7 @@ public class Banco {
             testaSaldoSuficiente(idContaOrigem, valor);
             contas.get(idContaOrigem).sacar(valor);
             contas.get(idContaDestino).depositar(valor);
-            mensagemSaida = "Transferência Realizada: Conta " + idContaOrigem + " para Conta " + idContaDestino
+            mensagemSaida = "Sucesso: Transferência Realizada da Conta " + idContaOrigem + " para Conta " + idContaDestino
                     + ", Valor: " + valor;
 
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class Banco {
             testaValorPositivo(valor);
             contaValida(id);
             contas.get(id).depositar(valor);
-            mensagemSaida = "Deposito Realizado: Saldo da Conta " + id + ": " + contas.get(id).getSaldo();
+            mensagemSaida = "Sucesso: Deposito Realizado na Conta " + id + ", Saldo: " + contas.get(id).getSaldo();
         } catch (Exception e) {
             throw new Exception("Erro de Deposito: " + e.getMessage());
         }

@@ -6,6 +6,90 @@
     "configurations": [
         {
             "type": "java",
+            "name": "UDPheartBeat",
+            "request": "launch",
+            "mainClass": "servidor.UDPheartBeat",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "UDPClient",
+            "request": "launch",
+            "mainClass": "clientes.UDPClient",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "UDPserver",
+            "request": "launch",
+            "mainClass": "servidor.UDPserver",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "TCPServer",
+            "request": "launch",
+            "mainClass": "servidor.TCPServer",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "ServerNode",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.ServerNode",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "Gateway",
+            "request": "launch",
+            "mainClass": "servidor.Gateway",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "TCPClient",
+            "request": "launch",
+            "mainClass": "clientes.TCPClient",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "HeartBeat",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.HeartBeat",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "ConnectionUDP",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.ConnectionUDP",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "ConnectionTCP",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.ConnectionTCP",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "ConnnectionsPool",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.ConnnectionsPool",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
+            "name": "Connection",
+            "request": "launch",
+            "mainClass": "Patterns.RWL.Connection",
+            "projectName": "Atividades_17d2c510"
+        },
+        {
+            "type": "java",
             "name": "serverTestes3RWL",
             "request": "launch",
             "mainClass": "serverTestes3RWL",
@@ -58,7 +142,8 @@
             "name": "TCPServer",
             "request": "launch",
             "mainClass": "TCPServer",
-            "projectName": "Atividades_17d2c510"
+            "projectName": "Atividades_17d2c510",
+            "args": "8084"
         },
         {
             "type": "java",
