@@ -2,6 +2,10 @@ package services.banco;
 
 import java.util.HashMap;
 
+import java.net.Socket;
+
+import Patterns.RWL.Connection;
+
 
 public class Banco {
 
@@ -36,6 +40,8 @@ public class Banco {
 
         mensagemSaida = "Sucesso: Conta " + id + " criada!";
 
+        salavaContaBD(novaConta, 9002);
+
     }
 
     public void transferir(String idContaOrigem, String idContaDestino, double valor) throws Exception {
@@ -50,6 +56,11 @@ public class Banco {
             mensagemSaida = "Sucesso: Transferência Realizada da Conta " + idContaOrigem + " para Conta " + idContaDestino
                     + ", Valor: " + valor;
 
+            salavaContaBD(contas.get(idContaOrigem), 9002);
+            salavaContaBD(contas.get(idContaDestino), 9002);
+
+            
+
         } catch (Exception e) {
             throw new Exception("Erro de Transferencia: " + e.getMessage());
         }
@@ -62,6 +73,9 @@ public class Banco {
             contaValida(id);
             contas.get(id).depositar(valor);
             mensagemSaida = "Sucesso: Deposito Realizado na Conta " + id + ", Saldo: " + contas.get(id).getSaldo();
+
+            salavaContaBD(contas.get(id), 9002);
+
         } catch (Exception e) {
             throw new Exception("Erro de Deposito: " + e.getMessage());
         }
@@ -102,6 +116,28 @@ public class Banco {
 
                 throw new Exception("Erro: comando inválido");
             // break;
+        }
+
+
+    }
+
+    public void salavaContaBD(Conta conta, int porta){
+        try (Socket cliente = new Socket("localhost", porta)) {
+
+            // cliente.connect(new InetSocketAddress("localhost", porta));
+            // --- teste de envio de objeto
+
+            // System.out.println("TCP cliente: Envio do objeto: " + conta);
+
+            Connection.sendObject(conta, cliente);
+
+            // var mensagemRecebida = Connection.receiveData(cliente);
+
+            // System.out.println("TCP- cliente - resposta servidor: " + mensagemRecebida);
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 

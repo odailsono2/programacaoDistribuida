@@ -1,5 +1,7 @@
 package servidor;
+
 import Patterns.RWL.Client;
+import Patterns.RWL.Connection;
 import Patterns.RWL.Node;
 import Patterns.RWL.RequestOrResponse;
 import Patterns.RWL.RequestWaitingList;
@@ -98,8 +100,8 @@ public class serverTestes1RWL {
 						RequestOrResponse req = new RequestOrResponse(new StringRequest(1, receivePacket.getData()),
 								11);
 
-						//System.out.println("Vindo do gateway:");
-				//		System.out.println(new String(req.getRequest().getData()));
+						// System.out.println("Vindo do gateway:");
+						// System.out.println(new String(req.getRequest().getData()));
 
 						String message = new String(receivePacket.getData());
 
@@ -152,6 +154,8 @@ public class serverTestes1RWL {
 		try (ServerSocket serverSocket = new ServerSocket(porta, 1, InetAddress.getByName("127.0.0.1"))) {
 
 			ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+
+			new TCPBancoDeDados(porta);
 
 			System.out.println("Servidor TCP esperando conexões na porta " + porta);
 
@@ -229,8 +233,8 @@ public class serverTestes1RWL {
 						if (lider && tipoNodeMensagameRecebida.equals("Lider")
 								|| lider && tipoNodeMensagameRecebida.equals("servidor")) {
 
-							//System.out.println("Mensagem Recebida " + receivedMessage + " do servidor "
-							//		+ clientSocket.getInetAddress().getHostName());
+							// System.out.println("Mensagem Recebida " + receivedMessage + " do servidor "
+							// + clientSocket.getInetAddress().getHostName());
 							try {
 
 								if (receivedMessage == null) {
@@ -239,6 +243,8 @@ public class serverTestes1RWL {
 
 								}
 								mensagemSaidaThread = executarOperacaoBancaria(receivedMessage, httpOn);
+
+				
 
 							} catch (Exception e) {
 								var erroBanco = e.getMessage();
@@ -252,7 +258,7 @@ public class serverTestes1RWL {
 
 						if (lider && tipoNodeMensagameRecebida.equals("cliente")) {
 							///- Request Waiting Lista TCP	
-							//System.out.println("--- Iniciando Request WaitingList");
+							// System.out.println("--- Iniciando Request WaitingList");
 
 							// "GET /cliente:criar;3 HTTP/1.1");
 							// "Host: localhost");
@@ -268,7 +274,7 @@ public class serverTestes1RWL {
 
 							for (Node node : servers) {
 								node.setTypeConnection(TypeConnection.TCP);
-								//System.out.println("Enviando mensagem para no: " + node.getPort());
+								// System.out.println("Enviando mensagem para no: " + node.getPort());
 								// System.out.println("No: " + node.getAddress().getHostName() + ":" +
 								// node.getPort());
 
@@ -295,7 +301,7 @@ public class serverTestes1RWL {
 
 									var sendMessage = httpOn ? httpCabecalho : localReceivedMensage;
 
-									//System.out.println("mensagem a ser enviado\r\n" + sendMessage);
+									// System.out.println("mensagem a ser enviado\r\n" + sendMessage);
 
 									var mensagemRecebida = sendAndReceiveRequestOtherServers(
 											sendMessage.getBytes(),
@@ -361,14 +367,14 @@ public class serverTestes1RWL {
 		} catch (Exception e) {
 
 			if (httpOn) {
-				//System.out.println(e.getMessage());
+				// System.out.println(e.getMessage());
 
 				mensagemSaida = handleHTTP(receivedMessage, e.getMessage());
 
 				// outCliente.println(handleHTTP(receivedMessage, e.getMessage()));
 
 			} else {
-				//System.out.println(e.getMessage());
+				// System.out.println(e.getMessage());
 
 				mensagemSaida = e.getMessage();
 
@@ -466,12 +472,12 @@ public class serverTestes1RWL {
 
 		// Criar threads virtuais para TCP e UDP
 
-		int porta=0;
+		int porta = 0;
 
-		if (args.length == 1){
+		if (args.length == 1) {
 			porta = Integer.parseInt(args[0]);
-		}else{
-			throw new Exception ("Zero argumentos passados na main");
+		} else {
+			throw new Exception("Zero argumentos passados na main");
 		}
 
 		serverTestes1RWL server = new serverTestes1RWL(porta);

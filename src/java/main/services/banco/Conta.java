@@ -1,11 +1,17 @@
 package services.banco;
-/**
- * Conta
- */
-public class Conta {
+import java.io.Serializable;
+
+public class Conta implements Serializable{
 
     private String id;
     private double saldo;
+
+    public Conta(){}
+
+    public Conta(String id, double saldo) {
+        this.id = id;
+        this.saldo = saldo;
+    }
 
     public String getId() {
         return id;
